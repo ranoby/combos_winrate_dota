@@ -36,10 +36,13 @@ def check(side, matchInfoJSON, userHeroes):
     else:
         team_side = 1
 
-    pick = [matchInfoJSON['picks_bans'][i]['hero_id'] \
-            for i in range(0, 22) if matchInfoJSON['picks_bans'][i]['team'] == team_side\
-                                    and matchInfoJSON['picks_bans'][i]['is_pick'] == True]
-    check_items = all(item in pick for item in userHeroes)
+    try:
+        pick = [matchInfoJSON['picks_bans'][i]['hero_id'] \
+                for i in range(0, 22) if matchInfoJSON['picks_bans'][i]['team'] == team_side\
+                                        and matchInfoJSON['picks_bans'][i]['is_pick'] == True]
+        check_items = all(item in pick for item in userHeroes)
+    except:
+        pass
 
     return check_items
 
@@ -47,34 +50,39 @@ def check(side, matchInfoJSON, userHeroes):
 def matchInfo(matchesIDes, userHeroes):
     matchesInfo = []
 
-    # cycle if we have several teams thats mean more than 1 list of matches IDs
+    for k in range(0, len(matchesIDes)):
+        # cycle if we have several teams thats mean more than 1 list of matches IDs
 
-    wins = 0
-    total = 0
+        wins = 0
+        total = 0
 
-    team_id = matchesIDes[0][0]
-    for i in matchesIDes[0][1:]:
-        print(i)
+        team_id = matchesIDes[k][0]
+        for i in matchesIDes[k][1:]:
+            print(i)
 
-        matchInfoJSON = requests.get(api_match_info.format(str(i))).json()
+            matchInfoJSON = requests.get(api_match_info.format(str(i))).json()
 
-        # Who win radiant or dire?
-        whoWin = matchInfoJSON['radiant_win']
-        # Where is my team, my team win?, does my team have a combo pick?
-        if team_id == matchInfoJSON['radiant_team_id']:
-            my_team_side = True
-        else:
-            my_team_side = False
+            # Who win radiant or dire?
+            try:
+                whoWin = matchInfoJSON['radiant_win']
+            except:
+                continue
 
-        # For radiant
-        if check(my_team_side, matchInfoJSON, userHeroes):
-            # Heroes I'm searching for in pick?
-            total += 1
+            # Where is my team, my team win?, does my team have a combo pick?
+            if team_id == matchInfoJSON['radiant_team_id']:
+                my_team_side = True
+            else:
+                my_team_side = False
 
-            if whoWin == my_team_side:
-                wins += 1
+            # For radiant
+            if check(my_team_side, matchInfoJSON, userHeroes):
+                # Heroes I'm searching for in pick?
+                total += 1
 
-    matchesInfo.append([total, wins])
+                if whoWin == my_team_side:
+                    wins += 1
+
+        matchesInfo.append([total, wins])
 
     return matchesInfo
 

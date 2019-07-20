@@ -7,9 +7,11 @@ import Main
 
 def comboWinrate(matchesIDes, userHeroes):
     matchesInfo = Main.matchInfo(matchesIDes, userHeroes)
-    winrate = matchesInfo[0][1]/matchesInfo[0][0]
+    for i in range(0, len(matchesInfo)):
+        if matchesInfo[i][0] > 0:
+            winrate = matchesInfo[i][1]/matchesInfo[i][0]
+            print ("total {} winrate {:2.2%}".format(matchesInfo[i][0], winrate))
 
-    print ("total {} winrate {:2.2%}".format(matchesInfo[0][0], winrate))
     return 0
 
 
@@ -63,7 +65,5 @@ while True:
 
     if user_answer == 'n':
         break
-
-print("Thank you! And good luck! =)")
 
 
